@@ -9,8 +9,8 @@ class Encoder(nn.Module):
         for i in range(n_layer):
             self.layers.append(copy.deepcopy(encoder_block))
     
-    def forward(self, x):
-        out = x
+    def forward(self, src, src_mask):
+        out = src
         for layer in self.layers:
-            out = layer(out)
+            out = layer(out, src_mask)
         return out
