@@ -4,12 +4,13 @@ import numpy as np
 import torch
 
 class Transformer(nn.Module):
-    def __init__(self, src_embed, tgt_embed, encoder, decoder):
+    def __init__(self, src_embed, tgt_embed, encoder, decoder, generator):
         super(Transformer, self).__init__()
         self.src_embed = src_embed
         self.tgt_embed = tgt_embed
         self.encoder = encoder
         self.decoder = decoder
+        self.generator = generator
     
     def encode(self, src, src_mask):
         #out = self.encoder(src, src_mask)
@@ -26,8 +27,10 @@ class Transformer(nn.Module):
         tgt_mask = self.make_tgt_mask(tgt_sentence)
         src_tgt_mask = self.make_src_tgt_mask(tgt_sentence, src_sentence)
         context_vector = self.encode(src_sentence, src_mask)
-        out = self.decode(tgt_sentence, context_vector, tgt_mask, src_tgt_mask)
-        return out
+        decoder_out = self.decode(tgt_sentence, context_vector, tgt_mask, src_tgt_mask)
+        out = self.generator(decoder_out)
+        out = F.log_softmax(out, dim=-1)
+        return out, decoder_out
     
     def make_pad_mask(self, query, key, pad_idx=1): #pad_idx : pad 해야하는 index들 탐색
         # query : ( n_batch, query_seq_len)
