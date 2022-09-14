@@ -4,17 +4,21 @@ import numpy as np
 import torch
 
 class Transformer(nn.Module):
-    def __init__(self, encoder, decoder):
+    def __init__(self, src_embed, tgt_embed, encoder, decoder):
         super(Transformer, self).__init__()
+        self.src_embed = src_embed
+        self.tgt_embed = tgt_embed
         self.encoder = encoder
         self.decoder = decoder
     
     def encode(self, src, src_mask):
-        out = self.encoder(src, src_mask)
+        #out = self.encoder(src, src_mask)
+        out = self.encoder(self.src_embed(src), src_mask)
         return out
 
     def decode(self, tgt_sentence, context, tgt_mask, src_tgt_mask):
-        out = self.decoder(tgt_sentence,context, tgt_mask, src_tgt_mask)
+        #out = self.decoder(tgt_sentence,context, tgt_mask, src_tgt_mask)
+        out = self.decoder(self.tgt_embed(tgt_sentence), context, tgt_mask, src_tgt_mask)
         return out
     
     def forward(self, src_sentence, tgt_sentence):
